@@ -1,0 +1,104 @@
+/*****************************************************************************/
+/* This is the program skeleton for homework 2 in CSE167 by Ravi Ramamoorthi */
+/* Extends HW 1 to deal with shading, more transforms and multiple objects   */
+/*****************************************************************************/
+
+// This is the basic include file for the global variables in the program.  
+// Since all files need access to it, we define EXTERN as either blank or 
+// extern, depending on if included in the main program or not.  
+
+#ifdef MAINPROGRAM 
+#define EXTERN 
+#else 
+#define EXTERN extern 
+#endif
+
+EXTERN int amount; // The amount of rotation for each arrow press
+EXTERN vec3 eye; // The (regularly updated) vector coordinates of the eye 
+EXTERN vec3 up;  // The (regularly updated) vector coordinates of the up 
+
+#ifdef MAINPROGRAM 
+vec3 eyeinit(0.0,0.0,5.0) ; // Initial eye position, also for resets
+vec3 upinit(0.0,1.0,0.0) ; // Initial up position, also for resets
+vec3 center(0.0,0.0,0.0) ; // Center look at point 
+int amountinit = 5;
+int w = 500, h = 500 ; // width and height 
+float fovy = 90.0 ; // For field of view
+#else 
+EXTERN vec3 eyeinit ; 
+EXTERN vec3 upinit ; 
+EXTERN vec3 center ; 
+EXTERN int amountinit;
+EXTERN int w, h, depth; 
+EXTERN float fovy ; 
+#endif 
+
+EXTERN bool useGlu; // Toggle use of "official" opengl/glm transform vs user 
+EXTERN GLuint vertexshader, fragmentshader, shaderprogram ; // shaders
+EXTERN mat4 projection, modelview; // The mvp matrices
+EXTERN GLuint projectionPos, modelviewPos; // Uniform locations of the above matrices
+static enum {view, translate, scale} transop ; // which operation to transform 
+enum shape {cube, sphere, teapot} ;
+EXTERN float sx, sy ; // the scale in x and y 
+EXTERN float tx, ty ; // the translation in x and y
+
+// Lighting parameter array, similar to that in the fragment shader
+const int numLights = 10 ; 
+EXTERN GLfloat dirlightposn [3*numLights] ; // Directional Light Positions
+EXTERN GLfloat dirlightcol [3*numLights] ; // Directional Light Colors
+EXTERN GLfloat poilightposn [3*numLights] ; // Point Light Positions
+EXTERN GLfloat poilightcol [3*numLights] ;
+//EXTERN GLfloat lightransf[4*numLights] ; // Lights transformed by modelview
+EXTERN int numused ;                     // How many lights are used 
+
+// Materials (read from file) 
+// With multiple objects, these are colors for each.
+EXTERN GLfloat ambient[3] ; 
+EXTERN GLfloat diffuse[3] ; 
+EXTERN GLfloat specular[3] ; 
+EXTERN GLfloat emission[3] ; 
+EXTERN GLfloat shininess[3] ; 
+EXTERN GLfloat attenuation[3] ;
+
+// For multiple objects, read from a file.  
+const int maxobjects = 10 ;
+EXTERN int numobjects ; 
+EXTERN struct object { 
+  GLfloat size ;
+  GLfloat posn[3];
+  mat4 transform ; 
+} objects[maxobjects] ;
+EXTERN int maxverts ;
+EXTERN int numverts ;
+EXTERN struct vertices {
+	GLfloat posn[3];
+	mat4 transform;
+} vertices[maxverts];
+EXTERN int maxnormverts ;
+EXTERN int numnormverts ;
+EXTERN struct normvertices {
+	GLfloat posn[6];
+	mat4 transform;
+} normvertices[maxnormverts];
+EXTERN int numtri;
+EXTERN int numnormtri;
+EXTERN struct triangle {
+	vertices v1, v2, v3;
+	mat4 transform;
+} triangle[numobjects];
+EXTERN struct normtriangle {
+	normvertices v1, v2, v3;
+	mat4 transform;
+} normtriangle[numobjects];
+
+// Variables to set uniform params for lighting fragment shader 
+EXTERN GLuint lightcol ; 
+EXTERN GLuint lightpos ; 
+EXTERN GLuint numusedcol ; 
+EXTERN GLuint enablelighting ; 
+EXTERN GLuint ambientcol ; 
+EXTERN GLuint diffusecol ; 
+EXTERN GLuint specularcol ; 
+EXTERN GLuint emissioncol ; 
+EXTERN GLuint shininesscol ; 
+
