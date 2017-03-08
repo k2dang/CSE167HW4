@@ -32,7 +32,7 @@
 #include "Transform.h" 
 
 using namespace std;
-#include "variables.h" 
+#include "variables_hw4.h" 
 #include "readfile.h"
 
 // You may not need to use the following two functions, but it is provided
@@ -267,7 +267,7 @@ void readfile(const char* filename)
 					else {
 						validinput = readvals(s, 3, values);
 						if(validinput) {
-							vertices * vert = &(vertices[numverts]));
+							vertices * vert = &(vertices[numverts]);
 							for (i = 0; i < 3; i++) {
 								(vert->posn)[i] = values[i];
 							}
@@ -283,7 +283,7 @@ void readfile(const char* filename)
 					else {
 						validinput = readvals(s, 3, values);
 						if(validinput) {
-							normvertices * nvert = &(normvertices[numnormverts]));
+							normvertices * nvert = &(normvertices[numnormverts]);
 							for (i = 0; i < 6; i++) {
 								(nvert->posn)[i] = values[i];
 							}
