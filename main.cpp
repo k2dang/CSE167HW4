@@ -7,23 +7,23 @@
 
 #include <iostream>
 #include <string>
-// #include <fstream>
-// #include <sstream>
-// #include <deque>
-// #include <stack>
+#include <fstream>
+#include <sstream>
+#include <deque>
+#include <stack>
 // #include <GL/glew.h>
 // #include <GL/glut.h>
 // #include "shaders.h"
-// #include "Transform.h"
-// #include <FreeImage.h>
+#include "Transform.h"
+#include <FreeImage.h>
 // #include "UCSD/grader.h"
-// #include "Geometry.h"
+#include "Geometry.h"
 
 using namespace std ; 
 
 // Main variables in the program.  
 #define MAINPROGRAM 
-#include "variables.h" 
+#include "variables_hw4.h" 
 #include "readfile.h" // prototypes for readfile.cpp  
 void display(void) ;  // prototype for display function.  
 
