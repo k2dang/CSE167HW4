@@ -15,19 +15,16 @@ endif
 
 RM = /bin/rm -f 
 all: transforms
-transforms: main.o Transform.o readfile.o display.o variables.h readfile.h Transform.h \
-	   Geometry.o
-	$(CC) $(CFLAGS) -o transforms main.o Transform.o Geometry.o readfile.o display.o  $(INCFLAGS) $(LDFLAGS) 
+transforms: main.o Transform.o readfile.o camera.o variables.h readfile.h Transform.h \
+	$(CC) $(CFLAGS) -o transforms main.o Transform.o readfile.o camera.o  $(INCFLAGS) $(LDFLAGS) 
 main.o: main.cpp Transform.h variables.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c main.cpp
 readfile.o: readfile.cpp readfile.h variables.h 
 	$(CC) $(CFLAGS) $(INCFLAGS) -c readfile.cpp
-display.o: display.cpp variables.h Geometry.h
-	$(CC) $(CFLAGS) $(INCFLAGS) -c display.cpp
+camera.o: camera.cpp variables.h
+	$(CC) $(CFLAGS) $(INCFLAGS) -c camera.cpp
 Transform.o: Transform.cpp Transform.h 
 	$(CC) $(CFLAGS) $(INCFLAGS) -c Transform.cpp  
-Geometry.o: Geometry.cpp Geometry.h Transform.h variables.h
-	$(CC) $(CFLAGS) $(INCFLAGS) -c Geometry.cpp
 clean: 
 	$(RM) *.o transforms *.png
 

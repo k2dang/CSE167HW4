@@ -13,11 +13,8 @@
 #include <stack>
 // #include "include/GL/glew.h"
 // #include "include/GL/glut.h"
-// #include "shaders.h"
 #include "Transform.h"
 #include "include/FreeImage.h"
-// #include "UCSD/grader.h"
-#include "Geometry.h"
 
 using namespace std ; 
 
@@ -26,9 +23,6 @@ using namespace std ;
 #include "variables.h" 
 #include "readfile.h" // prototypes for readfile.cpp  
 void display(void) ;  // prototype for display function.  
-
-// Grader grader;
-// bool allowGrader = false;
 
 // // Reshapes the window
 // void reshape(int width, int height){
