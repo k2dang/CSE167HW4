@@ -32,7 +32,7 @@
 #include "Transform.h" 
 
 using namespace std;
-#include "variables_hw4.h" 
+#include "variables.h" 
 #include "readfile.h"
 
 // You may not need to use the following two functions, but it is provided
@@ -239,7 +239,7 @@ void readfile(const char* filename)
 						validinput = readvals(s, 4, values);
 						if (validinput) {
 							object * obj = &(objects[numobjects]);
-							obj->size = values[3]
+							obj->size = values[3];
 							for (i = 0; i < 3; i++) {
 								(obj->posn)[i] = values[i];
 							}
@@ -267,7 +267,7 @@ void readfile(const char* filename)
 					else {
 						validinput = readvals(s, 3, values);
 						if(validinput) {
-							vertices * vert = &(vertices[numverts]);
+							vertice * vert = &(vertices[numverts]);
 							for (i = 0; i < 3; i++) {
 								(vert->posn)[i] = values[i];
 							}
@@ -283,7 +283,7 @@ void readfile(const char* filename)
 					else {
 						validinput = readvals(s, 3, values);
 						if(validinput) {
-							normvertices * nvert = &(normvertices[numnormverts]);
+							normvertice * nvert = &(normvertices[numnormverts]);
 							for (i = 0; i < 6; i++) {
 								(nvert->posn)[i] = values[i];
 							}
@@ -298,12 +298,11 @@ void readfile(const char* filename)
 					} else {
 						validinput = readvals(s, 3, values);
 						if (validinput) {
-							triangle * tri = &(triangle[numtri]);
-							
-							tri->v1 = vertices[values[0]];
-							tri->v2 = vertices[values[1]];
-							tri->v3 = vertices[values[2]];
-							obj->transform = transfstack.top();
+							triangle * tri = &(triangles[numtri]);
+							tri->v1 = vertices[ int(values[0]) ];
+							tri->v2 = vertices[ int(values[1]) ];
+							tri->v3 = vertices[ int(values[2]) ];
+							tri->transform = transfstack.top();
 						}
 						++numobjects;
 						++numtri;
@@ -315,12 +314,11 @@ void readfile(const char* filename)
 					} else {
 						validinput = readvals(s, 3, values);
 						if (validinput) {
-							normtriangle * ntri = &(normtriangle[numnormtri]);
-							
-							ntri->v1 = normvertices[values[0]];
-							ntri->v2 = normvertices[values[1]];
-							ntri->v3 = normvertices[values[2]];
-							obj->transform = transfstack.top();
+							normtriangle * ntri = &(normtriangles[numnormtri]);
+							ntri->v1 = normvertices[int(values[0])];
+							ntri->v2 = normvertices[int(values[1])];
+							ntri->v3 = normvertices[int(values[2])];
+							ntri->transform = transfstack.top();
 						}
 						++numobjects;
 						++numnormtri;
@@ -394,7 +392,7 @@ void readfile(const char* filename)
         amount = 5;
         sx = sy = 1.0;  // keyboard controlled scales in x and y 
         tx = ty = 0.0;  // keyboard controllled translation in x and y  
-        useGlu = false; // don't use the glu perspective/lookat fns
+        // useGlu = false; // don't use the glu perspective/lookat fns
 
         glEnable(GL_DEPTH_TEST);
     } else {

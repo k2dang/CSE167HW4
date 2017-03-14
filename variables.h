@@ -55,34 +55,35 @@ EXTERN float attenuation[3] ;
 
 // For multiple objects, read from a file.  
 const int maxobjects = 10 ;
+const int tempMax = 10 ; 
 EXTERN int numobjects ; 
 EXTERN struct object { 
   float size ;
   float posn[3];
   mat4 transform ; 
-} objects[maxobjects] ;
-EXTERN int maxverts ;
+} objects[tempMax] ;
 EXTERN int numverts ;
-EXTERN struct vertices {
+EXTERN int maxverts ; 
+EXTERN struct vertice {
 	float posn[3];
 	mat4 transform;
-} vertices[maxverts];
-EXTERN int maxnormverts ;
+} vertices[tempMax];
 EXTERN int numnormverts ;
-EXTERN struct normvertices {
+EXTERN int maxnormverts;
+EXTERN struct normvertice {
 	float posn[6];
 	mat4 transform;
-} normvertices[maxnormverts];
+} normvertices[tempMax];
 EXTERN int numtri;
 EXTERN int numnormtri;
 EXTERN struct triangle {
-	vertices v1, v2, v3;
+	struct vertice v1, v2, v3;
 	mat4 transform;
-} triangle[numobjects];
+} triangles[tempMax];
 EXTERN struct normtriangle {
-	normvertices v1, v2, v3;
+	struct normvertice v1, v2, v3;
 	mat4 transform;
-} normtriangle[numobjects];
+} normtriangles[tempMax];
 
 // Variables to set uniform params for lighting fragment shader 
 EXTERN int lightcol ; 
