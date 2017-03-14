@@ -8,8 +8,8 @@
 #ifndef GLM_FORCE_RADIANS
 #define GLM_FORCE_RADIANS
 #endif
-// #include <glm/glm.hpp>
-// #include <glm/gtc/matrix_transform.hpp>
+#include "glm-0.9.7.1/glm/glm.hpp"
+#include "glm-0.9.7.1/glm/gtc/matrix_transform.hpp"
 
 // glm provides vector, matrix classes like glsl
 // Typedefs to make code more readable 

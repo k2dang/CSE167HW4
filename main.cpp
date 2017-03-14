@@ -11,11 +11,11 @@
 #include <sstream>
 #include <deque>
 #include <stack>
-// #include <GL/glew.h>
-// #include <GL/glut.h>
+// #include "include/GL/glew.h"
+// #include "include/GL/glut.h"
 // #include "shaders.h"
 #include "Transform.h"
-#include <FreeImage.h>
+#include "include/FreeImage.h"
 // #include "UCSD/grader.h"
 #include "Geometry.h"
 
@@ -23,12 +23,12 @@ using namespace std ;
 
 // Main variables in the program.  
 #define MAINPROGRAM 
-#include "variables_hw4.h" 
+#include "variables.h" 
 #include "readfile.h" // prototypes for readfile.cpp  
 void display(void) ;  // prototype for display function.  
 
-Grader grader;
-bool allowGrader = false;
+// Grader grader;
+// bool allowGrader = false;
 
 // // Reshapes the window
 // void reshape(int width, int height){
