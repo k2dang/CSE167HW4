@@ -85,6 +85,23 @@ EXTERN struct normtriangle {
 	mat4 transform;
 } normtriangles[tempMax];
 
+// For our ray tracer 
+EXTERN struct Ray {
+	vec3 origin;
+	vec3 direction; 
+}
+EXTERN struct Intersection {
+	vec3 position;
+	vec3 normal;
+	// material * mat;
+	float distance;
+}
+EXTERN struct Camera {
+	vec3 eye;
+	vec3 up; 
+	vec3 center;
+}
+
 // Variables to set uniform params for lighting fragment shader 
 EXTERN int lightcol ; 
 EXTERN int lightpos ; 

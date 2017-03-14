@@ -2,10 +2,14 @@
 // manipulate
 
 #include "readfile.h"
-#include "pixel.h"
+#include "variables.h"
 
 class Scene {
 public:
 
-	sc
+	float filmPixels[3 * w][h]; 				// to output colors into the scene
+
+	void Raytrace(Camera cam, vec3 scene, int width, int height);
+	Ray RayThruPixel(Camera cam, int height, int height);
+
 }
