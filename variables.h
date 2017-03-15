@@ -8,6 +8,8 @@
 #define EXTERN extern 
 #endif
 
+#include <vector>
+
 EXTERN int amount; // The amount of rotation for each arrow press
 EXTERN vec3 eye; // The (regularly updated) vector coordinates of the eye 
 EXTERN vec3 up;  // The (regularly updated) vector coordinates of the up 
@@ -54,53 +56,62 @@ EXTERN float shininess[3] ;
 EXTERN float attenuation[3] ;
 
 // For multiple objects, read from a file.  
-const int maxobjects = 10 ;
-const int tempMax = 10 ; 
+
+
+// spheres
 EXTERN int numobjects ; 
-EXTERN struct object { 
+EXTERN struct sphere { 
   float size ;
   float posn[3];
   mat4 transform ; 
-} objects[tempMax] ;
+} ;
+// vertices 
 EXTERN int numverts ;
 EXTERN int maxverts ; 
 EXTERN struct vertice {
 	float posn[3];
 	mat4 transform;
-} vertices[tempMax];
+};
 EXTERN int numnormverts ;
 EXTERN int maxnormverts;
 EXTERN struct normvertice {
 	float posn[6];
 	mat4 transform;
-} normvertices[tempMax];
+};
+// triangles
 EXTERN int numtri;
 EXTERN int numnormtri;
 EXTERN struct triangle {
 	struct vertice v1, v2, v3;
 	mat4 transform;
-} triangles[tempMax];
+};
 EXTERN struct normtriangle {
 	struct normvertice v1, v2, v3;
 	mat4 transform;
-} normtriangles[tempMax];
+};
+
+EXTERN std::vector <sphere> sphereVect;
+EXTERN std::vector <vertice> verticeVect; 
+EXTERN std::vector <normvertice> normverticeVect;
+EXTERN std::vector <triangle> triangleVect;
+EXTERN std::vector <normtriangle> normtriVect;
 
 // For our ray tracer 
 EXTERN struct Ray {
 	vec3 origin;
 	vec3 direction; 
-}
+};
 EXTERN struct Intersection {
 	vec3 position;
 	vec3 normal;
 	// material * mat;
 	float distance;
-}
+};
 EXTERN struct Camera {
 	vec3 eye;
 	vec3 up; 
 	vec3 center;
-}
+};
 
 // Variables to set uniform params for lighting fragment shader 
 EXTERN int lightcol ; 

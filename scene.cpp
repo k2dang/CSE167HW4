@@ -1,5 +1,4 @@
 #include "scene.h"
-#include "Ray.cpp"
 
 // If this doesn't work, PUT AT THE BOTTOM AND TRY
 // The main processor of the ray tracing

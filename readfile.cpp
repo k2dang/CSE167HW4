@@ -73,65 +73,63 @@ void readfile(const char* filename)
     ifstream in;
     in.open(filename); 
     if (in.is_open()) {
+      // I need to implement a matrix stack to store transforms.  
+      // This is done using standard STL Templates 
+      stack <mat4> transfstack; 
+      transfstack.push(mat4(1.0));  // identity
 
-        // I need to implement a matrix stack to store transforms.  
-        // This is done using standard STL Templates 
-        stack <mat4> transfstack; 
-        transfstack.push(mat4(1.0));  // identity
+      getline (in, str); 
+      while (in) {
+        if ((str.find_first_not_of(" \t\r\n") != string::npos) && (str[0] != '#')) {
+          // Ruled out comment and blank lines 
+          stringstream s(str);
+          s >> cmd; 
+					int i = 0;
+          GLfloat values[10]; // Position and color for light, colors for others
+              								// Up to 10 params for cameras.  
+          bool validinput; // Validity of input 
 
-        getline (in, str); 
-        while (in) {
-            if ((str.find_first_not_of(" \t\r\n") != string::npos) && (str[0] != '#')) {
-                // Ruled out comment and blank lines 
-
-                stringstream s(str);
-                s >> cmd; 
-				int i = 0;
-                GLfloat values[10]; // Position and color for light, colors for others
-                                    // Up to 10 params for cameras.  
-                bool validinput; // Validity of input 
-
-                // Process the light, add it to database.
-                // Lighting Command				
-				// STILL UNSURE ABOUT THE NUMBER OF LIGHTS SO BEWARE OF THAT!!!!!!!!!!!!!!!!!!!!!!!!!
-				// DID YOU SEE THIS YET
-				// COME ON MAKE SURE YOU LOOK AT THIS
-				// JUST IN CASE YOU WONDER WHATS WRONG
-				// CHECK THIS FIRST
-				// YOU KNOW
-				if (cmd == "directional") {
-					validinput = readvals(s, 6, values); // direction and color to light source
-					if (validinput) {
-						for (i = 0; i < 3; i++) {
-							dirlightposn[i] = values[i];
-						}
-						for (i = 3; i < 6; i++) {
-							dirlightcol[i] = values[i];
+          // Process the light, add it to database.
+          // Lighting Command				
+					// STILL UNSURE ABOUT THE NUMBER OF LIGHTS SO BEWARE OF THAT!!!!!!!!!!!!!!!!!!!!!!!!!
+					// DID YOU SEE THIS YET
+					// COME ON MAKE SURE YOU LOOK AT THIS
+					// JUST IN CASE YOU WONDER WHATS WRONG
+					// CHECK THIS FIRST
+					// YOU KNOW
+					if (cmd == "directional") {
+						validinput = readvals(s, 6, values); // direction and color to light source
+						if (validinput) {
+							for (i = 0; i < 3; i++) {
+								dirlightposn[i] = values[i];
+							}
+							for (i = 3; i < 6; i++) {
+								dirlightcol[i] = values[i];
+							}
 						}
 					}
-				}
 				
-				else if (cmd == "point") {
-					validinput = readvals(s, 6, values); // point and color to light source
-					if (validinput) {
-						for (i = 0; i < 3; i++) {
-							poilightposn[i] = values[i];
-						}
-						for (i = 3; i < 3; i++) {
-							poilightcol[i] = values[i];
-						}
-					}
-				}
-				
-				else if (cmd == "attenuation") {
-					validinput = readvals(s, 3, values); // attentuation of lights
-					if (validinput) {
-						for (i = 0; i < 3; i++) {
-							attenuation[i] = values[i];
+					else if (cmd == "point") {
+						validinput = readvals(s, 6, values); // point and color to light source
+						if (validinput) {
+							for (i = 0; i < 3; i++) {
+								poilightposn[i] = values[i];
+							}
+							for (i = 3; i < 3; i++) {
+								poilightcol[i] = values[i];
+							}
 						}
 					}
-				}
 				
+					else if (cmd == "attenuation") {
+						validinput = readvals(s, 3, values); // attentuation of lights
+						if (validinput) {
+							for (i = 0; i < 3; i++) {
+								attenuation[i] = values[i];
+							}
+						}
+					}
+					
                 /*if (cmd == "light") {
                     if (numused == numLights) { // No more Lights 
                         cerr << "Reached Maximum Number of Lights " << numused << " Will ignore further lights\n";
@@ -164,239 +162,220 @@ void readfile(const char* filename)
                 // the skeleton, also as a hint of how to do the more complex ones.
                 // Note that no transforms/stacks are applied to the colors. 
 
-                else if (cmd == "ambient") {
-                    validinput = readvals(s, 3, values); // colors 
-                    if (validinput) {
-                        for (i = 0; i < 3; i++) {
-                            ambient[i] = values[i]; 
-                        }
-                    }
-                } else if (cmd == "diffuse") {
-                    validinput = readvals(s, 3, values); 
-                    if (validinput) {
-                        for (i = 0; i < 3; i++) {
-                            diffuse[i] = values[i]; 
-                        }
-                    }
-                } else if (cmd == "specular") {
-                    validinput = readvals(s, 3, values); 
-                    if (validinput) {
-                        for (i = 0; i < 3; i++) {
-                            specular[i] = values[i]; 
-                        }
-                    }
-                } else if (cmd == "emission") {
-                    validinput = readvals(s, 3, values); 
-                    if (validinput) {
-                        for (i = 0; i < 3; i++) {
-                            emission[i] = values[i]; 
-                        }
-                    }
-                } else if (cmd == "shininess") {
-                    validinput = readvals(s, 3, values); 
-                    if (validinput) {
-                        shininess[i] = values[i]; 
-                    }
-                } else if (cmd == "size") {
-                    validinput = readvals(s,2,values); 
-                    if (validinput) { 
-                        w = (int) values[0]; h = (int) values[1]; 
-                    } 
-                } else if (cmd == "maxdepth") {
-					validinput = readvals(s,1,values);
-					if (validinput) {
-						depth = (int) values[0];
-					}
-				} else if (cmd == "camera") {
-                    validinput = readvals(s,10,values); // 10 values eye cen up fov
-                    if (validinput) {
-
-                        // YOUR CODE FOR HW 2 HERE
-                        // Use all of values[0...9]
-                        // You may need to use the upvector fn in Transform.cpp
-                        // to set up correctly. 
-                        // Set eyeinit upinit center fovy in variables.h 
-						for (i = 0; i < 3; i++) {
-							eyeinit[i] = values[i];
-						}
-						for (i = 3; i < 6; i++) {
-							center[i-3] = values[i];
-						}
-						for (i = 6; i < 9; i++) {
-							upinit[i-6] = values[i];
-						}
-						fovy = values[9];
-                    }
-                }
-
-                // I've left the code for loading objects in the skeleton, so 
-                // you can get a sense of how this works.  
-                // Also look at demo.txt to get a sense of why things are done this way.
-				else if (cmd == "sphere") {
-					if (numobjects == maxobjects) {
-						cerr << "Reached Maximum Number of Objects " << numobjects << " Will ignore futher objects\n";
-					} else {
-						validinput = readvals(s, 4, values);
+          else if (cmd == "ambient") {
+              validinput = readvals(s, 3, values); // colors 
+              if (validinput) {
+                  for (i = 0; i < 3; i++) {
+                      ambient[i] = values[i]; 
+              		}
+          		}
+          } else if (cmd == "diffuse") {
+              validinput = readvals(s, 3, values); 
+              if (validinput) {
+                  for (i = 0; i < 3; i++) {
+                      diffuse[i] = values[i]; 
+                  }
+              }
+          } else if (cmd == "specular") {
+              validinput = readvals(s, 3, values); 
+              if (validinput) {
+                  for (i = 0; i < 3; i++) {
+                      specular[i] = values[i]; 
+                  }
+              }
+          } else if (cmd == "emission") {
+              validinput = readvals(s, 3, values); 
+              if (validinput) {
+                  for (i = 0; i < 3; i++) {
+                      emission[i] = values[i]; 
+                  }
+              }
+          } else if (cmd == "shininess") {
+              validinput = readvals(s, 3, values); 
+              if (validinput) {
+                  shininess[i] = values[i]; 
+              }
+          } else if (cmd == "size") {
+              validinput = readvals(s,2,values); 
+              if (validinput) { 
+                  w = (int) values[0]; h = (int) values[1]; 
+              } 
+          } else if (cmd == "maxdepth") {
+						validinput = readvals(s,1,values);
 						if (validinput) {
-							object * obj = &(objects[numobjects]);
-							obj->size = values[3];
-							for (i = 0; i < 3; i++) {
-								(obj->posn)[i] = values[i];
+							depth = (int) values[0];
+						}
+					} else if (cmd == "camera") {
+              validinput = readvals(s,10,values); // 10 values eye cen up fov
+              if (validinput) {
+
+								for (i = 0; i < 3; i++) {
+									eyeinit[i] = values[i];
+								}
+								for (i = 3; i < 6; i++) {
+									center[i-3] = values[i];
+								}
+								for (i = 6; i < 9; i++) {
+									upinit[i-6] = values[i];
+								}
+								fovy = values[9];
+              }
+            }
+
+            // I've left the code for loading objects in the skeleton, so 
+            // you can get a sense of how this works.  
+            // Also look at demo.txt to get a sense of why things are done this way.
+            else if (cmd == "maxverts") {
+							validinput = readvals(s, 1, values);
+							if (validinput) {
+								maxverts = values[0];
 							}
-							obj->transform = transfstack.top();
 						}
-						++numobjects;
-					}
-				}
-                else if (cmd == "maxverts") {
-					validinput = readvals(s, 1, values);
-					if (validinput) {
-						maxverts = values[0];
-					}
-				}
-				else if (cmd == "maxvertnorms") {
-					validinput = readvals(s, 1, values);
-					if (validinput) {
-						maxnormverts = values[0];
-					}
-				}
-				else if (cmd == "vertex") {
-					if (numverts == maxverts) {
-						cerr << "Reached Maximum Number of Vertices";
-					}
-					else {
-						validinput = readvals(s, 3, values);
-						if(validinput) {
-							vertice * vert = &(vertices[numverts]);
-							for (i = 0; i < 3; i++) {
-								(vert->posn)[i] = values[i];
+						else if (cmd == "maxvertnorms") {
+							validinput = readvals(s, 1, values);
+							if (validinput) {
+								maxnormverts = values[0];
 							}
-							vert->transform = transfstack.top();
 						}
-						++numverts;
-					}
-				}
-				else if (cmd == "vertexnormal") {
-					if (numverts == maxnormverts) {
-						cerr << "Reached Maximum Number of Normal Vertices";
-					}
-					else {
-						validinput = readvals(s, 3, values);
-						if(validinput) {
-							normvertice * nvert = &(normvertices[numnormverts]);
-							for (i = 0; i < 6; i++) {
-								(nvert->posn)[i] = values[i];
+						else if (cmd == "vertex") {
+							if (numverts == maxverts) {
+								cerr << "Reached Maximum Number of Vertices";
 							}
-							nvert->transform = transfstack.top();
+							else {
+								validinput = readvals(s, 3, values);
+								if(validinput) {
+									vertice * vert = &(vertices[numverts]);
+									for (i = 0; i < 3; i++) {
+										(vert->posn)[i] = values[i];
+									}
+									vert->transform = transfstack.top();
+								}
+								++numverts;
+							}
+						}	
+						else if (cmd == "vertexnormal") {
+							if (numnormverts == maxnormverts) {
+								cerr << "Reached Maximum Number of Normal Vertices";
+							}
+							else {
+								validinput = readvals(s, 3, values);
+								if(validinput) {
+									normvertice * nvert = &(normvertices[numnormverts]);
+									for (i = 0; i < 6; i++) {
+										(nvert->posn)[i] = values[i];
+									}
+									nvert->transform = transfstack.top();
+								}
+								++numnormverts;
+							}
 						}
-						++numnormverts;
-					}
-				}
-				else if (cmd == "tri") {
-					if (numobjects == maxobjects) {
-						cerr << "Reached Maximum Number of Objects " << numobjects << " Will ignore futher objects\n";
-					} else {
-						validinput = readvals(s, 3, values);
-						if (validinput) {
-							triangle * tri = &(triangles[numtri]);
-							tri->v1 = vertices[ int(values[0]) ];
-							tri->v2 = vertices[ int(values[1]) ];
-							tri->v3 = vertices[ int(values[2]) ];
-							tri->transform = transfstack.top();
+						else if (cmd == "tri") {
+							validinput = readvals(s, 3, values);
+							if (validinput) {
+								triangle tri;
+								tri->v1 = vertices[ int(values[0]) ];
+								tri->v2 = vertices[ int(values[1]) ];
+								tri->v3 = vertices[ int(values[2]) ];
+								tri->transform = transfstack.top();
+							}
+							++numobjects;
+							triangleVect.push_back(tri);
 						}
-						++numobjects;
-						++numtri;
-					}
-				}
-				else if (cmd == "trinormal") {
-					if (numobjects == maxobjects) {
-						cerr << "Reached Maximum Number of Objects " << numobjects << " Will ignore futher objects\n";
-					} else {
-						validinput = readvals(s, 3, values);
-						if (validinput) {
-							normtriangle * ntri = &(normtriangles[numnormtri]);
-							ntri->v1 = normvertices[int(values[0])];
-							ntri->v2 = normvertices[int(values[1])];
-							ntri->v3 = normvertices[int(values[2])];
-							ntri->transform = transfstack.top();
+						else if (cmd == "sphere") {
+							validinput = readvals(s, 4, values);
+							if (validinput) {
+								sphere sphr;
+								sphr->size = values[3];
+								for (i = 0; i < 3; i++) {
+									(sphr->posn)[i] = values[i];
+								}
+								sphr->transform = transfstack.top();
+							}
+							++numobjects;
+							sphereVect.push_back(sphr);
 						}
-						++numobjects;
-						++numnormtri;
-					}
-				}
-                else if (cmd == "translate") {
-                    validinput = readvals(s,3,values); 
-                    if (validinput) {
+						else if (cmd == "trinormal") {
+							validinput = readvals(s, 3, values);
+							if (validinput) {
+								normtriangle * ntri = &(normtriangles[numnormtri]);
+								ntri->v1 = normvertices[int(values[0])];
+								ntri->v2 = normvertices[int(values[1])];
+								ntri->v3 = normvertices[int(values[2])];
+								ntri->transform = transfstack.top();
+							}
+							++numobjects;
+							++numnormtri;
+						}
+            else if (cmd == "translate") {
+              validinput = readvals(s,3,values); 
+              if (validinput) {
+                // YOUR CODE FOR HW 2 HERE.  
+                // Think about how the transformation stack is affected
+                // You might want to use helper functions on top of file. 
+                // Also keep in mind what order your matrix is!
+								mat4 Mmult = Transform::translate(values[0], values[1], values[2]);
+								rightmultiply(Mmult, transfstack);
+              }
+            }
+            else if (cmd == "scale") {
+              validinput = readvals(s,3,values); 
+              if (validinput) {
+                // YOUR CODE FOR HW 2 HERE.  
+                // Think about how the transformation stack is affected
+                // You might want to use helper functions on top of file.  
+                // Also keep in mind what order your matrix is!
+								mat4 Mmult = Transform::scale(values[0], values[1], values[2]);
+								rightmultiply(Mmult, transfstack);
+              }	
+            }
+            else if (cmd == "rotate") {
+              validinput = readvals(s,4,values); 
+              if (validinput) {
+              // YOUR CODE FOR HW 2 HERE. 
+              // values[0..2] are the axis, values[3] is the angle.  
+              // You may want to normalize the axis (or in Transform::rotate)
+              // See how the stack is affected, as above.  
+              // Note that rotate returns a mat3. 
+              // Also keep in mind what order your matrix is!
+							vec3 ax = vec3(values[0], values[1], values[2]);
+							mat3 M3 = Transform::rotate(values[3], ax);
+							mat4 Mmult = mat4(M3[0][0], M3[0][1], M3[0][2], 0, M3[1][0], M3[1][1], M3[1][2], 0,
+																M3[2][0], M3[2][1], M3[2][2], 0, 0, 0, 0, 1);
+							rightmultiply(Mmult, transfstack);
+              }
+            }
 
-                        // YOUR CODE FOR HW 2 HERE.  
-                        // Think about how the transformation stack is affected
-                        // You might want to use helper functions on top of file. 
-                        // Also keep in mind what order your matrix is!
-						mat4 Mmult = Transform::translate(values[0], values[1], values[2]);
-						rightmultiply(Mmult, transfstack);
-                    }
-                }
-                else if (cmd == "scale") {
-                    validinput = readvals(s,3,values); 
-                    if (validinput) {
-
-                        // YOUR CODE FOR HW 2 HERE.  
-                        // Think about how the transformation stack is affected
-                        // You might want to use helper functions on top of file.  
-                        // Also keep in mind what order your matrix is!
-						mat4 Mmult = Transform::scale(values[0], values[1], values[2]);
-						rightmultiply(Mmult, transfstack);
-                    }
-                }
-                else if (cmd == "rotate") {
-                    validinput = readvals(s,4,values); 
-                    if (validinput) {
-
-                        // YOUR CODE FOR HW 2 HERE. 
-                        // values[0..2] are the axis, values[3] is the angle.  
-                        // You may want to normalize the axis (or in Transform::rotate)
-                        // See how the stack is affected, as above.  
-                        // Note that rotate returns a mat3. 
-                        // Also keep in mind what order your matrix is!
-						vec3 ax = vec3(values[0], values[1], values[2]);
-						mat3 M3 = Transform::rotate(values[3], ax);
-						mat4 Mmult = mat4(M3[0][0], M3[0][1], M3[0][2], 0, M3[1][0], M3[1][1], M3[1][2], 0,
-							M3[2][0], M3[2][1], M3[2][2], 0, 0, 0, 0, 1);
-						rightmultiply(Mmult, transfstack);
-                    }
-                }
-
-                // I include the basic push/pop code for matrix stacks
-                else if (cmd == "pushTransform") {
-                    transfstack.push(transfstack.top()); 
-                } else if (cmd == "popTransform") {
-                    if (transfstack.size() <= 1) {
-                        cerr << "Stack has no elements.  Cannot Pop\n"; 
-                    } else {
-                        transfstack.pop(); 
-                    }
-                }
-
-                else {
-                    cerr << "Unknown Command: " << cmd << " Skipping \n"; 
+            // I include the basic push/pop code for matrix stacks
+            else if (cmd == "pushTransform") {
+                transfstack.push(transfstack.top()); 
+            } else if (cmd == "popTransform") {
+                if (transfstack.size() <= 1) {
+                    cerr << "Stack has no elements.  Cannot Pop\n"; 
+                } else {
+                    transfstack.pop(); 
                 }
             }
-            getline (in, str); 
+
+            else {
+                cerr << "Unknown Command: " << cmd << " Skipping \n"; 
+            }
         }
-
-        // Set up initial position for eye, up and amount
-        // As well as booleans 
-
-        eye = eyeinit; 
-        up = upinit; 
-        amount = 5;
-        sx = sy = 1.0;  // keyboard controlled scales in x and y 
-        tx = ty = 0.0;  // keyboard controllled translation in x and y  
-        // useGlu = false; // don't use the glu perspective/lookat fns
-
-        glEnable(GL_DEPTH_TEST);
-    } else {
-        cerr << "Unable to Open Input Data File " << filename << "\n"; 
-        throw 2; 
+        getline (in, str); 
     }
+
+    // Set up initial position for eye, up and amount
+    // As well as booleans 
+
+    eye = eyeinit; 
+    up = upinit; 
+    amount = 5;
+    sx = sy = 1.0;  // keyboard controlled scales in x and y 
+    tx = ty = 0.0;  // keyboard controllled translation in x and y  
+    // useGlu = false; // don't use the glu perspective/lookat fns
+
+    glEnable(GL_DEPTH_TEST);
+  } else {
+      cerr << "Unable to Open Input Data File " << filename << "\n"; 
+      throw 2; 
+  	}
 }
