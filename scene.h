@@ -1,15 +1,31 @@
 // The class that manages the entire process and holds the screen to 
 // manipulate
+// #include "variables.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
-#include "readfile.h"
-#include "variables.h"
+typedef glm::vec3 vec3;
 
 class Scene {
 public:
+	// For our ray tracer 
+	struct Ray {
+		vec3 origin;
+		vec3 direction; 
+	};
+	struct Intersection {
+		vec3 position;
+		vec3 normal;
+		// material * mat;
+		float distance;
+	};
+	struct Camera {
+		vec3 eye;
+		vec3 up; 
+		vec3 center;
+	};
 
-	float filmPixels[3 * w][h]; 				// to output colors into the scene
+	void Raytrace(Camera cam, int width, int height, float ** filmPixel);
+	Ray RayThruPixel(Camera cam, int height, int width);
 
-	void Raytrace(Camera cam, vec3 scene, int width, int height);
-	Ray RayThruPixel(Camera cam, int height, int height);
-
-}
+};

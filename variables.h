@@ -9,10 +9,18 @@
 #endif
 
 #include <vector>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+typedef glm::vec3 vec3;
+typedef glm::vec4 vec4;
+typedef glm::mat3 mat3;
+typedef glm::mat4 mat4;
 
 EXTERN int amount; // The amount of rotation for each arrow press
 EXTERN vec3 eye; // The (regularly updated) vector coordinates of the eye 
 EXTERN vec3 up;  // The (regularly updated) vector coordinates of the up 
+// const float pi = 3.1415926535;
 
 #ifdef MAINPROGRAM 
 vec3 eyeinit(0.0,0.0,5.0) ; // Initial eye position, also for resets
@@ -20,13 +28,15 @@ vec3 upinit(0.0,1.0,0.0) ; // Initial up position, also for resets
 vec3 center(0.0,0.0,0.0) ; // Center look at point 
 int amountinit = 5;
 int w = 500, h = 500 ; // width and height 
+int depth = 5;
 float fovy = 90.0 ; // For field of view
 #else 
 EXTERN vec3 eyeinit ; 
 EXTERN vec3 upinit ; 
 EXTERN vec3 center ; 
 EXTERN int amountinit;
-EXTERN int w, h, depth; 
+EXTERN int w, h;
+EXTERN int depth; 
 EXTERN float fovy ; 
 #endif 
 
@@ -60,58 +70,41 @@ EXTERN float attenuation[3] ;
 
 // spheres
 EXTERN int numobjects ; 
-EXTERN struct sphere { 
+struct Sphere { 
   float size ;
   float posn[3];
   mat4 transform ; 
-} ;
+};
 // vertices 
 EXTERN int numverts ;
 EXTERN int maxverts ; 
-EXTERN struct vertice {
+struct Vertice {
 	float posn[3];
 	mat4 transform;
 };
 EXTERN int numnormverts ;
 EXTERN int maxnormverts;
-EXTERN struct normvertice {
+struct NormVertice {
 	float posn[6];
 	mat4 transform;
 };
 // triangles
 EXTERN int numtri;
 EXTERN int numnormtri;
-EXTERN struct triangle {
-	struct vertice v1, v2, v3;
+struct Triangle {
+	Vertice v1, v2, v3;
 	mat4 transform;
 };
-EXTERN struct normtriangle {
-	struct normvertice v1, v2, v3;
+struct NormTriangle {
+	NormVertice v1, v2, v3;
 	mat4 transform;
 };
 
-EXTERN std::vector <sphere> sphereVect;
-EXTERN std::vector <vertice> verticeVect; 
-EXTERN std::vector <normvertice> normverticeVect;
-EXTERN std::vector <triangle> triangleVect;
-EXTERN std::vector <normtriangle> normtriVect;
-
-// For our ray tracer 
-EXTERN struct Ray {
-	vec3 origin;
-	vec3 direction; 
-};
-EXTERN struct Intersection {
-	vec3 position;
-	vec3 normal;
-	// material * mat;
-	float distance;
-};
-EXTERN struct Camera {
-	vec3 eye;
-	vec3 up; 
-	vec3 center;
-};
+EXTERN std::vector <Sphere> sphereVect;
+EXTERN std::vector <Vertice> verticeVect; 
+EXTERN std::vector <NormVertice> normverticeVect;
+EXTERN std::vector <Triangle> triangleVect;
+EXTERN std::vector <NormTriangle> normtriVect;
 
 // Variables to set uniform params for lighting fragment shader 
 EXTERN int lightcol ; 

@@ -244,13 +244,14 @@ void readfile(const char* filename)
 							else {
 								validinput = readvals(s, 3, values);
 								if(validinput) {
-									vertice * vert = &(vertices[numverts]);
+									Vertice vert;
 									for (i = 0; i < 3; i++) {
-										(vert->posn)[i] = values[i];
+										(vert.posn)[i] = values[i];
 									}
-									vert->transform = transfstack.top();
+									vert.transform = transfstack.top();
+									verticeVect.push_back(vert);
+									++numverts;
 								}
-								++numverts;
 							}
 						}	
 						else if (cmd == "vertexnormal") {
@@ -260,51 +261,52 @@ void readfile(const char* filename)
 							else {
 								validinput = readvals(s, 3, values);
 								if(validinput) {
-									normvertice * nvert = &(normvertices[numnormverts]);
+									NormVertice nvert;
 									for (i = 0; i < 6; i++) {
-										(nvert->posn)[i] = values[i];
+										(nvert.posn)[i] = values[i];
 									}
-									nvert->transform = transfstack.top();
+									nvert.transform = transfstack.top();
+									normverticeVect.push_back(nvert);
+									++numnormverts;
 								}
-								++numnormverts;
 							}
 						}
 						else if (cmd == "tri") {
 							validinput = readvals(s, 3, values);
 							if (validinput) {
-								triangle tri;
-								tri->v1 = vertices[ int(values[0]) ];
-								tri->v2 = vertices[ int(values[1]) ];
-								tri->v3 = vertices[ int(values[2]) ];
-								tri->transform = transfstack.top();
+								Triangle tri;
+								tri.v1 = verticeVect[ int(values[0]) ];
+								tri.v2 = verticeVect[ int(values[1]) ];
+								tri.v3 = verticeVect[ int(values[2]) ];
+								tri.transform = transfstack.top();
+								++numobjects;
+								triangleVect.push_back(tri);							
 							}
-							++numobjects;
-							triangleVect.push_back(tri);
 						}
 						else if (cmd == "sphere") {
 							validinput = readvals(s, 4, values);
 							if (validinput) {
-								sphere sphr;
-								sphr->size = values[3];
+								Sphere sphr;
+								sphr.size = values[3];
 								for (i = 0; i < 3; i++) {
-									(sphr->posn)[i] = values[i];
+									(sphr.posn)[i] = values[i];
 								}
-								sphr->transform = transfstack.top();
+								sphr.transform = transfstack.top();
+								++numobjects;
+								sphereVect.push_back(sphr);							
 							}
-							++numobjects;
-							sphereVect.push_back(sphr);
 						}
 						else if (cmd == "trinormal") {
 							validinput = readvals(s, 3, values);
 							if (validinput) {
-								normtriangle * ntri = &(normtriangles[numnormtri]);
-								ntri->v1 = normvertices[int(values[0])];
-								ntri->v2 = normvertices[int(values[1])];
-								ntri->v3 = normvertices[int(values[2])];
-								ntri->transform = transfstack.top();
-							}
-							++numobjects;
-							++numnormtri;
+								NormTriangle ntri;
+								ntri.v1 = normverticeVect[int(values[0])];
+								ntri.v2 = normverticeVect[int(values[1])];
+								ntri.v3 = normverticeVect[int(values[2])];
+								ntri.transform = transfstack.top();
+								++numobjects;
+								normtriVect.push_back(ntri);
+							}							
 						}
             else if (cmd == "translate") {
               validinput = readvals(s,3,values); 
@@ -373,7 +375,6 @@ void readfile(const char* filename)
     tx = ty = 0.0;  // keyboard controllled translation in x and y  
     // useGlu = false; // don't use the glu perspective/lookat fns
 
-    glEnable(GL_DEPTH_TEST);
   } else {
       cerr << "Unable to Open Input Data File " << filename << "\n"; 
       throw 2; 

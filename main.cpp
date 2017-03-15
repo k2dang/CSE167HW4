@@ -15,6 +15,7 @@
 // #include "include/GL/glut.h"
 #include "Transform.h"
 #include "include/FreeImage.h"
+#include "scene.h"
 
 using namespace std ; 
 
@@ -177,47 +178,23 @@ void display(void) ;  // prototype for display function.
 // }
 
 int main(int argc, char* argv[]) {
+  // Read in the file to get variables
+  readfile(argv[1]);
 
-  readfile(argv[1]) ; 
+  // Create the pixel array to store colors
+  // float filmPixels[3 * w][h];  
+  // cam = new Camera;
+  // cam->eye = eye;
+  // cam->up = up;
+  // cam->center = center;
 
-  // if (argc < 2) {
-  //   cerr << "Usage: transforms scenefile [grader input (optional)]\n"; 
-  //   exit(-1); 
-  // }
+  // scene::Raytrace(cam, w, h, )      
 
-  // FreeImage_Initialise();
-  // glutInit(&argc, argv);
-  // glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-  // glutCreateWindow("HW2: Scene Viewer");
+ 
 
-  // GLenum err = glewInit() ; 
-  // if (GLEW_OK != err) { 
-  //   std::cerr << "Error: " << glewGetString(err) << std::endl; 
-  // } 
 
-  // init();
-  // readfile(argv[1]) ; 
-  // glutDisplayFunc(display);
-  // glutSpecialFunc(specialKey);
-  // glutKeyboardFunc(keyboard);
-  // glutReshapeFunc(reshape);
-  // glutReshapeWindow(w, h);
+  FreeImage_Initialise();
 
-  // if (argc > 2) {
-  //   allowGrader = true;
-  //   stringstream tcid;
-  //   tcid << argv[1] << "." << argv[2];
-  //   grader.init(tcid.str());
-  //   grader.loadCommands(argv[2]);
-  //   grader.bindDisplayFunc(display);
-  //   grader.bindSpecialFunc(specialKey);
-  //   grader.bindKeyboardFunc(keyboard);
-  //   grader.bindScreenshotFunc(saveScreenshot);
-  // }
-
-  // printHelp();
-  // glutMainLoop();
-  // FreeImage_DeInitialise();
-  // destroyBufferObjects();
+  FreeImage_DeInitialise();
   return 0;
 }

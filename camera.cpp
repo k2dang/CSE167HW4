@@ -23,7 +23,9 @@ using namespace std;
 
 void camera() 
 {
+// public:
+//   // modelview = Transform::lookAt(eye,center,up); 
+// 	// modelview =modelview* obj->transform;
 
-  modelview = Transform::lookAt(eye,center,up); 
-	// modelview =modelview* obj->transform;
+
 }

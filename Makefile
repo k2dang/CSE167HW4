@@ -15,10 +15,12 @@ endif
 
 RM = /bin/rm -f 
 all: transforms
-transforms: main.o Transform.o readfile.o camera.o variables.h readfile.h Transform.h 
-	$(CC) $(CFLAGS) -o transforms main.o Transform.o readfile.o camera.o $(INCFLAGS) $(LDFLAGS) 
+transforms: main.o scene.o Transform.o readfile.o camera.o variables.h readfile.h Transform.h 
+	$(CC) $(CFLAGS) -o transforms main.o scene.o Transform.o readfile.o camera.o $(INCFLAGS) $(LDFLAGS) 
 main.o: main.cpp Transform.h variables.h
 	$(CC) $(CFLAGS) $(INCFLAGS) -c main.cpp
+scene.o: scene.cpp scene.h variables.h 
+	$(CC) $(CFLAGS) $(INCFLAGS) -c scene.cpp
 readfile.o: readfile.cpp readfile.h variables.h 
 	$(CC) $(CFLAGS) $(INCFLAGS) -c readfile.cpp
 camera.o: camera.cpp variables.h
