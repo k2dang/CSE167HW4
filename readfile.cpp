@@ -287,10 +287,10 @@ void readfile(const char* filename)
 							validinput = readvals(s, 4, values);
 							if (validinput) {
 								Sphere sphr;
-								sphr.size = values[3];
-								for (i = 0; i < 3; i++) {
-									(sphr.posn)[i] = values[i];
-								}
+								sphr.radius = (float) values[3];
+								sphr.x = (float) values[0];
+								sphr.y = (float) values[1];
+								sphr.z = (float) values[2];				
 								sphr.transform = transfstack.top();
 								++numobjects;
 								sphereVect.push_back(sphr);							

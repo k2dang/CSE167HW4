@@ -66,15 +66,6 @@ EXTERN float shininess[3] ;
 EXTERN float attenuation[3] ;
 
 // For multiple objects, read from a file.  
-
-
-// spheres
-EXTERN int numobjects ; 
-struct Sphere { 
-  float size ;
-  float posn[3];
-  mat4 transform ; 
-};
 // vertices 
 EXTERN int numverts ;
 EXTERN int maxverts ; 
@@ -87,6 +78,13 @@ EXTERN int maxnormverts;
 struct NormVertice {
 	float posn[6];
 	mat4 transform;
+};
+// spheres
+EXTERN int numobjects ; 
+struct Sphere { 
+  float radius;
+  float x, y, z;
+  mat4 transform; 
 };
 // triangles
 EXTERN int numtri;
