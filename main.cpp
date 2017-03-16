@@ -182,7 +182,36 @@ int main(int argc, char* argv[]) {
   readfile(argv[1]);
 
   // Create the pixel array to store colors
-  // float filmPixels[3 * w][h];  
+  
+  //int filmPixels[3 *w][h];  
+  
+  int numpix = w*h;
+  BYTE *pixelss = new BYTE[3*numpix];
+  
+  /*
+  int wi = 0;
+  int he = 0;
+  for (int x = 0; x < numpix; x = x + 3){
+	pixelss[x] = filmPixels[wi][h];
+	pixelss[x+1] = filmPixels[wi+1][he];
+    pixelss[x+2] = filmPixels[wi+2][he];
+	
+	wi=wi+3;
+	if(wi == (w*3)) {
+	  wi = 0;
+	  he = he + 1;
+	};
+  }
+  */
+
+  for(int x = 0; x < numpix; x = x + 3) {
+		pixelss[x] = 0;
+		pixelss[x+1] = (int)((float)x / (float)h * 255.0);
+		pixelss[x+2] = (int)((float)x / (float)h * 255.0);
+  }
+  FIBITMAP *img = FreeImage_ConvertFromRawBits(pixelss, w, h, w * 3, 24, 0xFF0000, 0x00FF00, 0x0000FF, false);
+  if(FreeImage_Save(FIF_PNG, img, "yes.png", 0))
+	std::cout<<"\nImage saved successfully\n";
   // cam = new Camera;
   // cam->eye = eye;
   // cam->up = up;
