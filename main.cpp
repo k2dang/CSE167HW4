@@ -11,6 +11,7 @@
 #include <sstream>
 #include <deque>
 #include <stack>
+#include <vector>
 // #include "include/GL/glew.h"
 // #include "include/GL/glut.h"
 #include "Transform.h"
@@ -181,19 +182,59 @@ int main(int argc, char* argv[]) {
   // Read in the file to get variables
   readfile(argv[1]);
 
-  // Create the pixel array to store colors
-  // float filmPixels[3 * w][h];  
-  // cam = new Camera;
-  // cam->eye = eye;
-  // cam->up = up;
-  // cam->center = center;
-
-  // scene::Raytrace(cam, w, h, )      
-
- 
-
-
   FreeImage_Initialise();
+
+  // Create the pixel array to store colors
+  //nt filmPixels[w * 3][h] = new int[][];
+  //int * filmP = &filmPixels;  
+  
+  int numpix = w*h;
+  int * filmPixels = new int[3*numpix];
+  BYTE *pixelss = new BYTE[3*numpix];
+
+  Scene s;
+
+  Scene::Camera cam;
+  cam.eye = eye;
+  cam.up = up;
+  cam.center = center;
+
+  // Have Raytrace do the work to fill the filmPixels
+  s.Raytrace(cam, w, h, filmPixels);  
+
+  // Convert pixel double array to a single array
+  // std::vector <int> temp;
+  // for (int i = 0; i < 3 * w; i++) {
+  //   for (int j = 0; j < h; j++) 
+  //     temp.push_back(filmPixels[i][j]);
+  // }
+  // int * pixels = &temp[0];
+
+  for (int he = 0; he < h; he++){
+    for (int wi = 0; wi < w; wi++){
+      pixelss[(he * w * 3) + ((wi * 3) + 0)] = filmPixels[(he * w * 3) + ((wi * 3) + 0)];
+      pixelss[(he * w * 3) + ((wi * 3) + 1)] = filmPixels[(he * w * 3) + ((wi * 3) + 1)];
+      pixelss[(he * w * 3) + ((wi * 3) + 2)] = filmPixels[(he * w * 3) + ((wi * 3) + 2)];
+    }
+  }
+
+
+  // for (int x = 0; x < numpix; x++){
+  //   pixelss[x*3] = filmPixels[x];
+  //   pixelss[x*3+1] = filmPixels[x+1];
+  //   pixelss[x*3+2] = filmPixels[x+2];
+  // }
+  
+
+  // for (int x = 0; x < numpix; x++) {
+		// pixelss[x*3] = 0;
+		// pixelss[x*3+1] = 0;
+		// pixelss[x*3+2] = 255;
+  // }
+  FIBITMAP *img = FreeImage_ConvertFromRawBits(pixelss, w, h, w * 3, 24, 
+                                               0xFF0000, 0x00FF00, 0x0000FF, false);
+  if(FreeImage_Save(FIF_PNG, img, "testing.png", 0))
+	std::cout<<"\nImage saved successfully\n";    
 
   FreeImage_DeInitialise();
   return 0;
