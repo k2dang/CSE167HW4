@@ -1,10 +1,3 @@
-/******************************************************************************/
-/* This is the program skeleton for homework 2 in CSE167 by Ravi Ramamoorthi  */
-/* Extends HW 1 to deal with shading, more transforms and multiple objects    */
-/******************************************************************************/
-
-// You shouldn't have to edit this file at all!
-
 #include <iostream>
 #include <string>
 #include <fstream>

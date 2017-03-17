@@ -9,27 +9,23 @@
 void Scene::Raytrace(Camera cam, int width, int height, int * filmPixel) {
 	for (int i = 0; i < height; i++) {
 		for (int j = 0; j < width; j++) {
-			filmPixel[(i * width * 3) + ((j * 3) + 0)] = 255;
-			filmPixel[(i * width * 3) + ((j * 3) + 1)] = 0;
-   		filmPixel[(i * width * 3) + ((j * 3) + 2)] = 0;
-
 			Ray ray = RayThruPixel(cam, i, j);
 			Intersection hit = Intersect(ray);
-			std::cerr << hit.distance << "\n";
+			// std::cerr << hit.distance << "\n";
 
 			// Check if the ray hit anything (if not color is black)
 			if (hit.distance == 0xFFFFFFFF) {
-				filmPixel[i*(j*3)] = 0;
-				filmPixel[i*((j*3)+1)] = 0;
-	   		filmPixel[i*((j*3)+2)] = 0;
-				continue;
+				filmPixel[(i * width * 3) + ((j * 3) + 0)] = 0;
+				filmPixel[(i * width * 3) + ((j * 3) + 1)] = 0;
+	   		filmPixel[(i * width * 3) + ((j * 3) + 2)] = 0;
 			}
 
 			// TEST: MAKE PTS THAT INTERSECT BLUE
-			filmPixel[(i * width * 3) + ((j * 3) + 0)] = 255;
-			filmPixel[(i * width * 3) + ((j * 3) + 1)] = 0;
-   		filmPixel[(i * width * 3) + ((j * 3) + 2)] = 0;
-
+      else {
+			  filmPixel[(i * width * 3) + ((j * 3) + 0)] = 0;
+			  filmPixel[(i * width * 3) + ((j * 3) + 1)] = 0;
+   		  filmPixel[(i * width * 3) + ((j * 3) + 2)] = 255;
+      }
 			//vec3 color = FindColor(hit);
 			// filmPixel->[j][i] = color[0];
 			// filmPixel->[j + 1][i] = color[1];
@@ -157,10 +153,8 @@ Scene::Intersection Scene::Intersect(Ray ray) {
 
 		// Comput t distance
 		t = (dot(A, normal) - dot(origin, normal)) / denominator;
-
 		// Check if t is smaller than min t
 		if (t > minT) {
-			std::cerr << "_BUG";
 			continue;
 		}
 
@@ -177,7 +171,7 @@ Scene::Intersection Scene::Intersect(Ray ray) {
 		// vec3 pt2 = A - C;
 		// vec3 pt3 = B - C;
 
-		// mat3 r_side(pt1[0], pt1[1], pt1[2],
+		// mat3 r_side = mat3(pt1[0], pt1[1], pt1[2],
 		// 				 		pt2[0], pt2[1], pt2[2],
 		// 				 		pt3[0], pt3[1], pt3[2]);
 
@@ -189,9 +183,6 @@ Scene::Intersection Scene::Intersect(Ray ray) {
 		alpha = ((0.5*length(cross(B-P, C-P))) / (0.5*length(cross(B-A, C-A))));
 		beta = ((0.5*length(cross(A-P, C-P))) / (0.5*length(cross(B-A, C-A))));
 
-	  // std::cerr << alpha << " " << beta << std::endl;
-	  // std::cerr << length(cross(B-A, C-A)) << std::endl;
-
 		// Do checks to see if triangle intersected 
 		float epsilon = 0.0001;
 
@@ -200,9 +191,9 @@ Scene::Intersection Scene::Intersect(Ray ray) {
 		if (t < epsilon)
 			continue;					// No intersection 
 
-		if (((alpha < 0) || (alpha > 1)) || ((beta < 0) || (beta > 1)) || 
-							((1-alpha-beta) > 1) || (1-alpha-beta < 0) ) {
-			std::cerr << "bug" << std::endl;
+		if (((alpha < 0) || (alpha > 1)) || ((beta < 0) || (beta > 1))){ //|| 
+				//			((1-alpha-beta) > 1) || (1-alpha-beta < 0) ) {
+			// std::cerr << "bug" << std::endl;
 			continue;					// No intersection
 		}
 
@@ -218,7 +209,7 @@ Scene::Intersection Scene::Intersect(Ray ray) {
 		// DONT FORGET ABOUT MATERIAL!!!!
 		retIntersect.position = P;
 		retIntersect.normal = normal;
-		retIntersect.distance = t;
+		retIntersect.distance = minT;
 	}
 	
 	return retIntersect;
