@@ -39,7 +39,8 @@ void Scene::Raytrace(Camera cam, int width, int height, int * filmPixel) {
 // Output: Returns the ray from the camera that goes through a certain pixel
 Scene::Ray Scene::RayThruPixel(Camera cam, int height, int width) {
 	// Compute u v & w
-	vec3 wVec = glm::normalize(cam.eye);
+	// vec3 wVec = glm::normalize(cam.eye);
+	vec3 wVec = glm::normalize(cam.eye - cam.center);
 	vec3 bxw = glm::cross(cam.up, wVec);
 	vec3 uVec = glm::normalize(bxw);
 	vec3 vVec = glm::cross(wVec, uVec);
@@ -81,27 +82,42 @@ Scene::Intersection Scene::Intersect(Ray ray) {
 
 		// Grab the radius and compute center of the sphere
 		float radius = sp->radius;
-		vec3 center = vec3(sp->x, sp->y, sp->z);
+		vec3 spcenter = vec3(sp->x, sp->y, sp->z);
 		float t; 
 
 		// Check discriminant to see if there is an intersection
-		float discriminant, discriminant_pt1, discriminant_pt2;
-		float r_sq = radius * radius;
-		discriminant_pt1 = dot(dirn, (origin - center)) * dot(dirn, (origin - center));
-		discriminant_pt2 = dot((dirn - center), (origin - center)) - r_sq;
-		discriminant = discriminant_pt1 - discriminant_pt2;
+		// float discriminant, discriminant_pt1, discriminant_pt2;
+		// float r_sq = radius * radius;
+		// discriminant_pt1 = dot(dirn, (origin - center)) * dot(dirn, (origin - center));
+		// discriminant_pt2 = dot((dirn - center), (origin - center)) - r_sq;
+		// discriminant = discriminant_pt1 - discriminant_pt2;
 
-		// Check if discriminant is < 0, No intersection
+		// // Check if discriminant is < 0, No intersection
+		// if (discriminant < 0) {
+		// 	continue;
+		// }
+		
+		// // Calculate roots
+		// float root1 = dot(-dirn, (origin - center)) + sqrt(discriminant);
+		// float root2 = dot(-dirn, (origin - center)) - sqrt(discriminant);
+
+		float r_sq = radius * radius;
+		vec3 Z = origin - spcenter;
+		float disc_pt1 = 2 * (dot(dirn, Z));
+		float discriminant_pt1 = disc_pt1 * disc_pt1;
+		float discriminant_pt2 = 4 * dot(dirn, dirn) * (dot(Z, Z) - r_sq);
+		float discriminant = discriminant_pt1 - discriminant_pt2;
+
 		if (discriminant < 0) {
 			continue;
 		}
-		
-		// Calculate roots
-		float root1 = dot(-dirn, (origin - center)) + sqrt(discriminant);
-		float root2 = dot(-dirn, (origin - center)) - sqrt(discriminant);
+
+		float root1 = (-2 * dot(dirn, Z) + sqrt(discriminant)) / (2 * dot(dirn, dirn));
+		float root2 = (-2 * dot(dirn, Z) - sqrt(discriminant)) / (2 * dot(dirn, dirn));
+
 
 		// Check for 2 positive roots - pick smaller
-		if ((root1 > 0) && (root2 >0)) {
+		if ((root1 > 0) && (root2 > 0)) {
 			if (root1 > root2)
 				t = root2;
 			else
@@ -113,10 +129,12 @@ Scene::Intersection Scene::Intersect(Ray ray) {
 		}
 		// One positive and one negative - pick pos root
 		else {
-			if (root1 > 0)
-				t = root1;
-			else
-				t = root2;
+			// if (root1 > 0)
+			if ((root1 * root2) < 0) {
+				if (root1 > 0)
+					t = root1;
+				else
+					t = root2;
 		}
 
 		// Check if t is smaller than min t
@@ -126,12 +144,13 @@ Scene::Intersection Scene::Intersect(Ray ray) {
 		// Compute intersection point & normal
 		minT = t;
 		vec3 intersectPos = origin + (dirn * t);
-		vec3 normal = (intersectPos - center) / abs(intersectPos - center);
+		vec3 normal = (intersectPos - center) / length(intersectPos - center);
 
 		// DONT FORGET ABOUT MATERIAL!!!!
 		retIntersect.position = intersectPos;
 		retIntersect.normal = normal;
 		retIntersect.distance = t;
+			}
 	}
 
 	/* For each triangle, find intersection */
@@ -164,35 +183,39 @@ Scene::Intersection Scene::Intersect(Ray ray) {
 		// Check that it actually intersects triangle
 		float alpha;
 		float beta;
+		float gamma;
 		float _t;
 
-		// vec3 l_side = origin - B;
-		// vec3 pt1 = -dirn;
-		// vec3 pt2 = A - C;
-		// vec3 pt3 = B - C;
+		vec3 l_side = origin - C;
+		vec3 pt1 = -dirn;
+		vec3 pt2 = A - C;
+		vec3 pt3 = B - C;
 
-		// mat3 r_side = mat3(pt1[0], pt1[1], pt1[2],
-		// 				 		pt2[0], pt2[1], pt2[2],
-		// 				 		pt3[0], pt3[1], pt3[2]);
+		mat3 r_side = mat3(pt1[0], pt1[1], pt1[2],
+						 					 pt2[0], pt2[1], pt2[2],
+						 					 pt3[0], pt3[1], pt3[2]);
+		r_side = glm::inverse(glm::transpose(r_side));
 
-		// vec3 t_alpha_beta = l_side * r_side;
-		// _t = t_alpha_beta[0];
-		// alpha = t_alpha_beta[1];
-		// beta = t_alpha_beta[2];
+		vec3 t_alpha_beta = l_side * r_side;
+		_t = t_alpha_beta[0];
+		alpha = t_alpha_beta[1];
+		beta = t_alpha_beta[2];
+		gamma = 1.0 - alpha - beta;
+		// P = alpha * A + beta * B + gamma * C;
 
-		alpha = ((0.5*length(cross(B-P, C-P))) / (0.5*length(cross(B-A, C-A))));
-		beta = ((0.5*length(cross(A-P, C-P))) / (0.5*length(cross(B-A, C-A))));
+		// alpha = ((0.5*length(cross(B-P, C-P))) / (0.5*length(cross(B-A, C-A))));
+		// beta = ((0.5*length(cross(A-P, C-P))) / (0.5*length(cross(B-A, C-A))));
 
 		// Do checks to see if triangle intersected 
 		float epsilon = 0.0001;
 
 		// Should I check t and _t?
 
-		if (t < epsilon)
+		if (_t < epsilon)
 			continue;					// No intersection 
 
-		if (((alpha < 0) || (alpha > 1)) || ((beta < 0) || (beta > 1))){ //|| 
-				//			((1-alpha-beta) > 1) || (1-alpha-beta < 0) ) {
+		if (((alpha < 0) || (alpha > 1)) || ((beta < 0) || (beta > 1)) || 
+							(gamma > 1) || (gamma < 0) ) {
 			// std::cerr << "bug" << std::endl;
 			continue;					// No intersection
 		}
@@ -200,11 +223,11 @@ Scene::Intersection Scene::Intersect(Ray ray) {
 		// std::cerr << "lol";
 
 		// Check if t is smaller than min t
-		if (t > minT) 
+		if (_t > minT) 
 			continue;
 
 		// Compute intersection point & normal
-		minT = t;	
+		minT = _t;	
 
 		// DONT FORGET ABOUT MATERIAL!!!!
 		retIntersect.position = P;
