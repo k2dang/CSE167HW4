@@ -63,13 +63,33 @@ Scene::Ray Scene::RayThruPixel(Camera cam, int height, int width) {
 	return r; 
 }
 
+Scene::Ray Scene::RayTransform(Ray ray, mat4 trans) {
+  Scene::Ray retRay;
+  
+  // Convert ray components into vec4
+  vec4 ray4Origin = vec4(ray.origin.x, ray.origin.y, ray.origin.z, 1);
+  vec4 ray4Dirn = vec4(ray.direction.x, ray.direction.y, ray.direction.z, 0);
+  // compute transform wiith inverse transform M and ray
+  vec4 tempOrigin = inverse(trans)*ray4Origin;
+  vec4 tempDirn = inverse(trans)*ray4Dirn;
+
+  // convert ray components back to vec3
+  vec3 retOrigin = vec3(tempOrigin.x, tempOrigin.y, tempOrigin.z);
+  vec3 retDirn = vec3(tempDirn.x, tempDirn.y, tempDirn.z);
+
+  // Return ray
+  retRay.origin = retOrigin;
+  retRay.direction = retDirn;
+  return retRay;
+  
+}
 
 // Finds closest intersection to an object (if the ray intersects an object)
 // Compute intersections differently for spheres & triangles
 // Output: Returns the intersection of closest object or null if none???
 Scene::Intersection Scene::Intersect(Ray ray) {
-	vec3 origin = ray.origin;
-	vec3 dirn = ray.direction;
+	// vec3 origin = ray.origin;
+	// vec3 dirn = ray.direction;
 	// To check for smallest dist 
 	float minT = 0xFFFFFFFF;
 	Intersection retIntersect;
@@ -83,6 +103,9 @@ Scene::Intersection Scene::Intersect(Ray ray) {
 		// Grab the radius and compute center of the sphere
 		float radius = sp->radius;
 		vec3 spcenter = vec3(sp->x, sp->y, sp->z);
+    Ray tRay = RayTransform(ray, sp->transform);
+    vec3 origin = tRay.origin;
+    vec3 dirn = tRay.direction;
 		float t; 
 
 		// Check discriminant to see if there is an intersection
@@ -135,7 +158,8 @@ Scene::Intersection Scene::Intersect(Ray ray) {
 					t = root1;
 				else
 					t = root2;
-		}
+      }
+    }
 
 		// Check if t is smaller than min t
 		if (t > minT) 
@@ -143,14 +167,22 @@ Scene::Intersection Scene::Intersect(Ray ray) {
 
 		// Compute intersection point & normal
 		minT = t;
-		vec3 intersectPos = origin + (dirn * t);
-		vec3 normal = (intersectPos - center) / length(intersectPos - center);
+		vec3 Pos3 = origin + (dirn * t);
+		vec3 N3 = (Pos3 - center) / length(Pos3 - center);
 
+    // Convert Intersect components to vec4 to forawrd transform
+    vec4 tempPos = vec4(Pos3.x, Pos3.y, Pos3.z, 1.0);
+    vec4 tempNorm = vec4(N3.x, N3.y, N3.z, 1.0);
+
+    // Forward transform position and inverse transpose normal
+    vec4 intersectPos4 = sp->transform * tempPos;
+    vec4 normal4 = inverse(transpose(sp->transform)) * tempNorm;
+    vec3 intersectPos = vec3(intersectPos4.x, intersectPos4.y, intersectPos4.z);
+    vec3 normal = vec3(normal.x, normal.y, normal.z);
 		// DONT FORGET ABOUT MATERIAL!!!!
 		retIntersect.position = intersectPos;
 		retIntersect.normal = normal;
 		retIntersect.distance = t;
-			}
 	}
 
 	/* For each triangle, find intersection */
@@ -163,6 +195,11 @@ Scene::Intersection Scene::Intersect(Ray ray) {
 		vec3 C = vec3(tri->v3.posn[0], tri->v3.posn[1], tri->v3.posn[2]);
 
 		vec3 normal = cross((C - A), (B - A)) / length(cross((C - A), (B - A)));
+    
+    Ray tRay = RayTransform(ray, tri->transform);
+    vec3 origin = tRay.origin;
+    vec3 dirn = tRay.direction;
+		
 
 		// Check if denominator < 0 -> no intersection
 		float denominator = dot(dirn, normal);

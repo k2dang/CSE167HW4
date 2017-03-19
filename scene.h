@@ -27,6 +27,7 @@ public:
 
 	void Raytrace(Camera cam, int width, int height, int * filmPixel);
 	Ray RayThruPixel(Camera cam, int height, int width);
+  Ray RayTransform(Ray ray, mat4 trans);
 	Intersection Intersect(Ray ray);
 
 };
