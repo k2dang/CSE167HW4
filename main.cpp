@@ -182,7 +182,7 @@ int main(int argc, char* argv[]) {
   //int * filmP = &filmPixels;  
   
   int numpix = w*h;
-  int * filmPixels = new int[3*numpix];
+  float * filmPixels = new float[3*numpix];
   BYTE *pixelss = new BYTE[3*numpix];
 
   Scene s;

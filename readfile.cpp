@@ -77,6 +77,12 @@ void readfile(const char* filename)
       // This is done using standard STL Templates 
       stack <mat4> transfstack; 
       transfstack.push(mat4(1.0));  // identity
+      ambient[0] = 0;
+      ambient[1] = 0;
+      ambient[2] = 0;
+      attenuation[0] = 1;
+      attenuation[1] = 0;
+      attenuation[2] = 0;
 
       getline (in, str); 
       while (in) {
@@ -91,37 +97,34 @@ void readfile(const char* filename)
 
           // Process the light, add it to database.
           // Lighting Command				
-					// STILL UNSURE ABOUT THE NUMBER OF LIGHTS SO BEWARE OF THAT!!!!!!!!!!!!!!!!!!!!!!!!!
-					// DID YOU SEE THIS YET
-					// COME ON MAKE SURE YOU LOOK AT THIS
-					// JUST IN CASE YOU WONDER WHATS WRONG
-					// CHECK THIS FIRST
-					// YOU KNOW
-					if (cmd == "directional") {
-						validinput = readvals(s, 6, values); // direction and color to light source
-						if (validinput) {
-							for (i = 0; i < 3; i++) {
-								dirlightposn[i] = values[i];
-							}
-							for (i = 3; i < 6; i++) {
-								dirlightcol[i] = values[i];
-							}
-						}
-					}
+          if (cmd == "directional") {
+            validinput = readvals(s, 6, values);
+            if (validinput) {
+              DLight dl;
+              dl.x = (float) values[0];
+              dl.y = (float) values[1];
+              dl.z = (float) values[2];
+              dl.i = (float) values[3];
+              dl.j = (float) values[4];
+              dl.k = (float) values[5];
+              dirLightVect.push_back(dl);
+            }
+          }
+          else if (cmd == "point") {
+            validinput = readvals(s, 6, values);
+            if (validinput) {
+              PLight pl;
+              pl.x = (float) values[0];
+              pl.y = (float) values[1];
+              pl.z = (float) values[2];
+              pl.i = (float) values[3];
+              pl.j = (float) values[4];
+              pl.k = (float) values[5];
+              poiLightVect.push_back(pl);
+            }
+          }
 				
-					else if (cmd == "point") {
-						validinput = readvals(s, 6, values); // point and color to light source
-						if (validinput) {
-							for (i = 0; i < 3; i++) {
-								poilightposn[i] = values[i];
-							}
-							for (i = 3; i < 3; i++) {
-								poilightcol[i] = values[i];
-							}
-						}
-					}
-				
-					else if (cmd == "attenuation") {
+          else if (cmd == "attenuation") {
 						validinput = readvals(s, 3, values); // attentuation of lights
 						if (validinput) {
 							for (i = 0; i < 3; i++) {
@@ -129,38 +132,6 @@ void readfile(const char* filename)
 							}
 						}
 					}
-					
-                /*if (cmd == "light") {
-                    if (numused == numLights) { // No more Lights 
-                        cerr << "Reached Maximum Number of Lights " << numused << " Will ignore further lights\n";
-                    } else {
-                        validinput = readvals(s, 8, values); // Position/color for lts.
-                        if (validinput) {
-
-                            // YOUR CODE FOR HW 2 HERE. 
-                            // Note that values[0...7] shows the read in values 
-                            // Make use of lightposn[] and lightcolor[] arrays in variables.h
-                            // Those arrays can then be used in display too.
-
-							for (i = 0; i < 4; i++) {
-								int lightNum = (numused * 4) + i;
-								lightposn[lightNum] = values[i];
-							}
-							for (i = 4; i < 8; i++) {
-								int lightNum = (numused * 4) + (i-4);
-								lightcolor[lightNum] = values[i];
-							}
-
-                            ++numused; 
-                        }
-                    }
-                }*/
-
-                // Material Commands 
-                // Ambient, diffuse, specular, shininess properties for each object.
-                // Filling this in is pretty straightforward, so I've left it in 
-                // the skeleton, also as a hint of how to do the more complex ones.
-                // Note that no transforms/stacks are applied to the colors. 
 
           else if (cmd == "ambient") {
               validinput = readvals(s, 3, values); // colors 
@@ -191,9 +162,9 @@ void readfile(const char* filename)
                   }
               }
           } else if (cmd == "shininess") {
-              validinput = readvals(s, 3, values); 
+              validinput = readvals(s, 1, values); 
               if (validinput) {
-                  shininess[i] = values[i]; 
+                  shininess = values[0]; 
               }
           } else if (cmd == "size") {
               validinput = readvals(s,2,values); 
@@ -279,6 +250,7 @@ void readfile(const char* filename)
 								tri.v2 = verticeVect[ int(values[1]) ];
 								tri.v3 = verticeVect[ int(values[2]) ];
 								tri.transform = transfstack.top();
+                tri.ambient = vec3(ambient[0], ambient[1], ambient[2]);
 								++numobjects;
 								triangleVect.push_back(tri);							
 							}
@@ -292,6 +264,7 @@ void readfile(const char* filename)
 								sphr.y = (float) values[1];
 								sphr.z = (float) values[2];				
 								sphr.transform = transfstack.top();
+                sphr.ambient = vec3(ambient[0], ambient[1], ambient[2]);
 								++numobjects;
 								sphereVect.push_back(sphr);							
 							}
@@ -304,6 +277,7 @@ void readfile(const char* filename)
 								ntri.v2 = normverticeVect[int(values[1])];
 								ntri.v3 = normverticeVect[int(values[2])];
 								ntri.transform = transfstack.top();
+                ntri.ambient = vec3(ambient[0], ambient[1], ambient[2]);
 								++numobjects;
 								normtriVect.push_back(ntri);
 							}							

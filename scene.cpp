@@ -7,7 +7,7 @@
 // If this doesn't work, PUT AT THE BOTTOM AND TRY
 // The main processor of the ray tracing
 // Output: filmPixel will be filled with proper color codes to write to file
-void Scene::Raytrace(Camera cam, int width, int height, int * filmPixel) {
+void Scene::Raytrace(Camera cam, int width, int height, float * filmPixel) {
 	for (int i = 0; i < height; i++) {
 		for (int j = 0; j < width; j++) {
 			Ray ray = RayThruPixel(cam, i, j);
@@ -22,15 +22,15 @@ void Scene::Raytrace(Camera cam, int width, int height, int * filmPixel) {
 			}
 
 			// TEST: MAKE PTS THAT INTERSECT BLUE
-      else {
+      /*else {
 			  filmPixel[(i * width * 3) + ((j * 3) + 0)] = 0;
 			  filmPixel[(i * width * 3) + ((j * 3) + 1)] = 0;
    		  filmPixel[(i * width * 3) + ((j * 3) + 2)] = 255;
-      }
-			//vec3 color = FindColor(hit);
-			// filmPixel->[j][i] = color[0];
-			// filmPixel->[j + 1][i] = color[1];
-			// filmPixel->[j + 2][i] = color[2];
+      }*/
+			vec3 color = FindColor(cam, hit);
+			filmPixel[(i * width * 3) + ((j * 3) + 0)] = 255*color.z;
+   		filmPixel[(i * width * 3) + ((j * 3) + 1)] = 255*color.y;
+   		filmPixel[(i * width * 3) + ((j * 3) + 2)] = 255*color.x;
 		}
 	}
 }
@@ -187,6 +187,8 @@ Scene::Intersection Scene::Intersect(Ray ray) {
 		// DONT FORGET ABOUT MATERIAL!!!!
 		retIntersect.position = intersectPos;
 		retIntersect.normal = normal;
+    retIntersect.objTrans = sp->transform;
+    retIntersect.amb = sp->ambient;
 		retIntersect.distance = minT;
 	}
 
@@ -286,12 +288,87 @@ Scene::Intersection Scene::Intersect(Ray ray) {
 		// DONT FORGET ABOUT MATERIAL!!!!
 		retIntersect.position = p3;
 		retIntersect.normal = n3;
+    retIntersect.objTrans = tri->transform;
+    retIntersect.amb = tri->ambient;
 		retIntersect.distance = minT;
 	}
 	
 	return retIntersect;
 }
 
+vec3 ComputeLight (vec3 direction, vec3 normal,
+    vec3 halfvec, vec3 mydiffuse, vec3 myspecular, float myshininess) {
+
+  float nDotL = dot(normal, direction);
+  float maxl, maxh;
+  if(nDotL > 0) maxl = nDotL;
+  else maxl = 0.0;
+  vec3 lambert = mydiffuse * maxl;
+
+  float nDotH = dot(normal, halfvec);
+  if(nDotH > 0.0) maxh = nDotH;
+  else maxh = 0.0;
+  float maxp = pow(maxh, myshininess);
+  vec3 phong = myspecular * maxp;
+  
+  vec3 retVal = lambert + phong;
+  return retVal;
+}
+
+vec3 Scene::FindColor(Camera cam, Intersection hit) {
+  
+  vec3 finalcolor = vec3(0.0);
+
+  vec3 diff = vec3(diffuse[0], diffuse[1], diffuse[2]);
+  vec3 spec = vec3(specular[0], specular[1], specular[2]);
+  vec3 emi = vec3(emission[0], emission[1], emission[2]);
+  vec3 att = vec3(attenuation[0], attenuation[1], attenuation[2]);
+  vec3 amb = hit.amb;
+  
+  mat4 modelview = hit.objTrans;
+  vec4 myvertex = vec4(hit.position, 1.0f);
+  vec4 _mypos =  modelview * myvertex;
+  vec3 mypos = vec3(_mypos.x/_mypos.w, _mypos.y/_mypos.w, _mypos.z/_mypos.w);
+  vec3 eyedirn = normalize(cam.eye - mypos);
+
+  // Compute Normal
+  vec4 _normal = transpose(inverse(modelview))*vec4(hit.normal, 0.0f);
+  vec3 m_norm = vec3(_normal.x, _normal.y, _normal.z);
+  vec3 normal = normalize(m_norm);
+
+  for (std::vector<DLight>::iterator dl = dirLightVect.begin(); 
+			 dl != dirLightVect.end(); ++dl) {
+    vec3 col = vec3(0.0);
+    vec3 lightDir = vec3(dl->x, dl->y, dl->z);
+    vec3 curLCol = vec3(dl->i, dl->j, dl->k);;
+    vec3 direction = normalize(lightDir);
+    vec3 half = normalize(direction + eyedirn);
+    vec3 at = vec3(1, 0,0);
+    vec3 tcol = ComputeLight(direction, normal,
+        half, diff, spec, shininess);
+    vec3 tat = curLCol / at;
+    col = tat * tcol;
+    finalcolor = finalcolor + col;
+  }
+  for (std::vector<PLight>::iterator pl = poiLightVect.begin(); 
+			 pl != poiLightVect.end(); ++pl) {
+    vec3 col = vec3(0.0);
+    vec3 position = vec3(pl->x, pl->y, pl->z);
+    vec3 curLCol = vec3(pl->i, pl->j, pl->k);
+    vec3 direction = normalize(position - mypos);
+    vec3 half = normalize(direction + eyedirn);
+    vec3 at = vec3(att[0], att[1]*hit.distance, att[2]*hit.distance*hit.distance);
+    vec3 tcol = ComputeLight(direction, normal,
+        half, diff, spec, shininess);
+    vec3 tat = curLCol / at;
+    col = tat * tcol;
+    finalcolor = finalcolor + col;
+  }
+
+  finalcolor = amb + emi + finalcolor;
+
+  return finalcolor;
+}
 
 
 

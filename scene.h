@@ -16,6 +16,8 @@ public:
 	struct Intersection {
 		vec3 position;
 		vec3 normal;
+    mat4 objTrans;
+    vec3 amb;
 		// material * mat;
 		float distance;
 	};
@@ -25,9 +27,10 @@ public:
 		vec3 center;
 	};
 
-	void Raytrace(Camera cam, int width, int height, int * filmPixel);
+	void Raytrace(Camera cam, int width, int height, float * filmPixel);
 	Ray RayThruPixel(Camera cam, int height, int width);
   Ray RayTransform(Ray ray, mat4 trans);
 	Intersection Intersect(Ray ray);
+  vec3 FindColor(Camera cam, Intersection hit);
 
 };

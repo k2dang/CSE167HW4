@@ -48,13 +48,20 @@ EXTERN float sx, sy ; // the scale in x and y
 EXTERN float tx, ty ; // the translation in x and y
 
 // Lighting parameter array, similar to that in the fragment shader
-const int numLights = 10 ; 
-EXTERN float dirlightposn [3*numLights] ; // Directional Light Positions
-EXTERN float dirlightcol [3*numLights] ; // Directional Light Colors
-EXTERN float poilightposn [3*numLights] ; // Point Light Positions
-EXTERN float poilightcol [3*numLights] ;
+EXTERN int numdlights ; 
+struct DLight { 
+  float x, y, z;
+  float i, j, k; 
+};
+EXTERN int numplights ; 
+struct PLight { 
+  float x, y, z;
+  float i, j, k;
+};
+
+EXTERN std::vector <DLight> dirLightVect;
+EXTERN std::vector <PLight> poiLightVect;
 //EXTERN GLfloat lightransf[4*numLights] ; // Lights transformed by modelview
-EXTERN int numused ;                     // How many lights are used 
 
 // Materials (read from file) 
 // With multiple objects, these are colors for each.
@@ -62,7 +69,7 @@ EXTERN float ambient[3] ;
 EXTERN float diffuse[3] ; 
 EXTERN float specular[3] ; 
 EXTERN float emission[3] ; 
-EXTERN float shininess[3] ; 
+EXTERN float shininess ; 
 EXTERN float attenuation[3] ;
 
 // For multiple objects, read from a file.  
@@ -85,6 +92,7 @@ struct Sphere {
   float radius;
   float x, y, z;
   mat4 transform; 
+  vec3 ambient;
 };
 // triangles
 EXTERN int numtri;
@@ -92,10 +100,12 @@ EXTERN int numnormtri;
 struct Triangle {
 	Vertice v1, v2, v3;
 	mat4 transform;
+  vec3 ambient;
 };
 struct NormTriangle {
 	NormVertice v1, v2, v3;
 	mat4 transform;
+  vec3 ambient;
 };
 
 EXTERN std::vector <Sphere> sphereVect;
