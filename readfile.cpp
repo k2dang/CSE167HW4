@@ -278,10 +278,7 @@ void readfile(const char* filename)
 								tri.v1 = verticeVect[ int(values[0]) ];
 								tri.v2 = verticeVect[ int(values[1]) ];
 								tri.v3 = verticeVect[ int(values[2]) ];
-                if(transfstack.size() <= 1)
-								  tri.transform = transfstack.top();
-                else
-                  tri.transform = mat4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+								tri.transform = transfstack.top();
 								++numobjects;
 								triangleVect.push_back(tri);							
 							}
@@ -294,10 +291,7 @@ void readfile(const char* filename)
 								sphr.x = (float) values[0];
 								sphr.y = (float) values[1];
 								sphr.z = (float) values[2];				
-                if(transfstack.size() <= 1)
-								  sphr.transform = transfstack.top();
-                else
-                  sphr.transform = mat4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+								sphr.transform = transfstack.top();
 								++numobjects;
 								sphereVect.push_back(sphr);							
 							}
@@ -309,10 +303,7 @@ void readfile(const char* filename)
 								ntri.v1 = normverticeVect[int(values[0])];
 								ntri.v2 = normverticeVect[int(values[1])];
 								ntri.v3 = normverticeVect[int(values[2])];
-                if(transfstack.size() <= 1)
-								  ntri.transform = transfstack.top();
-                else
-                  ntri.transform = mat4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+								ntri.transform = transfstack.top();
 								++numobjects;
 								normtriVect.push_back(ntri);
 							}							

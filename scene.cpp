@@ -2,6 +2,7 @@
 #include "scene.h"
 #include <math.h>
 #include <iostream>
+#include <glm/gtc/type_ptr.hpp>
 
 // If this doesn't work, PUT AT THE BOTTOM AND TRY
 // The main processor of the ray tracing
@@ -65,6 +66,10 @@ Scene::Ray Scene::RayThruPixel(Camera cam, int height, int width) {
 
 Scene::Ray Scene::RayTransform(Ray ray, mat4 trans) {
   Scene::Ray retRay;
+  /*const float *psource = (const float*)glm::value_ptr(trans);
+  for(int i = 0; i < 16; i++)
+    std::cout<<psource[i] << "  ";
+  std::cout<<"\n";*/
   
   // Convert ray components into vec4
   vec4 ray4Origin = vec4(ray.origin.x, ray.origin.y, ray.origin.z, 1);
@@ -182,7 +187,7 @@ Scene::Intersection Scene::Intersect(Ray ray) {
 		// DONT FORGET ABOUT MATERIAL!!!!
 		retIntersect.position = intersectPos;
 		retIntersect.normal = normal;
-		retIntersect.distance = t;
+		retIntersect.distance = minT;
 	}
 
 	/* For each triangle, find intersection */
@@ -266,9 +271,21 @@ Scene::Intersection Scene::Intersect(Ray ray) {
 		// Compute intersection point & normal
 		minT = _t;	
 
+    // Convert Intersect components to vec4 to transform
+    vec4 p4 = vec4(P.x, P.y, P.z, 1);
+    vec4 n4 = vec4(normal.x, normal.y, normal.z, 1);
+
+    // Forward transform pos and inverse transpose normal
+    vec4 ipos4 = tri->transform * p4;
+    vec4 norm4 = inverse(transpose(tri->transform)) * n4;
+
+    // Convert back to vec3
+    vec3 p3 = vec3(ipos4.x, ipos4.y, ipos4.z);
+    vec3 n3 = vec3(norm4.x, norm4.y, norm4.z);
+
 		// DONT FORGET ABOUT MATERIAL!!!!
-		retIntersect.position = P;
-		retIntersect.normal = normal;
+		retIntersect.position = p3;
+		retIntersect.normal = n3;
 		retIntersect.distance = minT;
 	}
 	
