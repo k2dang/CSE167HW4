@@ -226,7 +226,7 @@ int main(int argc, char* argv[]) {
   // }
   FIBITMAP *img = FreeImage_ConvertFromRawBits(pixelss, w, h, w * 3, 24, 
                                                0xFF0000, 0x00FF00, 0x0000FF, true);
-  if(FreeImage_Save(FIF_PNG, img, "testing.png", 0))
+  if(FreeImage_Save(FIF_PNG, img, outputst.c_str(), 0))
 	std::cout<<"\nImage saved successfully\n";    
 
   FreeImage_DeInitialise();

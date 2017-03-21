@@ -9,6 +9,7 @@
 #endif
 
 #include <vector>
+#include <string>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -40,6 +41,7 @@ EXTERN int depth;
 EXTERN float fovy ; 
 #endif 
 
+EXTERN std::string outputst;
 EXTERN mat4 projection, modelview; // The mvp matrices
 EXTERN int projectionPos, modelviewPos; // Uniform locations of the above matrices
 static enum {view, translate, scale} transop ; // which operation to transform 

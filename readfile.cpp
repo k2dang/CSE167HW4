@@ -83,6 +83,7 @@ void readfile(const char* filename)
       attenuation[0] = 1;
       attenuation[1] = 0;
       attenuation[2] = 0;
+      outputst = "testing.png";
 
       getline (in, str); 
       while (in) {
@@ -176,7 +177,9 @@ void readfile(const char* filename)
 						if (validinput) {
 							depth = (int) values[0];
 						}
-					} else if (cmd == "camera") {
+					} else if (cmd == "output") {
+            s >> outputst;
+          } else if (cmd == "camera") {
               validinput = readvals(s,10,values); // 10 values eye cen up fov
               if (validinput) {
 
