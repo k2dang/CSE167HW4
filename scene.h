@@ -18,6 +18,8 @@ public:
 		vec3 normal;
     mat4 objTrans;
     vec3 amb;
+    vec3 preNorm;
+    vec3 prePos;
 		// material * mat;
 		float distance;
 	};

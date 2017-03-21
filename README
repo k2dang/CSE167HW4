@@ -1,1 +1,7 @@
-test
+Name: Norman Sun
+Partner's Name: Kevin Dang
+edX username: sunnorman
+URL to image grader:
+Acceleration structure: None
+
+Comments: We were able to get our intersection tests to work and we were able to render all the images from scene 2 and scene 3 correctly. Also, our transformations work as well. However, when directional and point lighting comes into play, we are getting an incorrect image. We tried printing out the colors used for scene1 (which should be red) however we were getting an RGB of (25.5, 0, 0). We couldn't find where in our code the misplace in the decimal point came from. Rendering our images also takes absurdly long as scene5 alone took over 40minutes to render. As we kept trying to fix our code and update with the new solutions to the lighting mentioned above, we ran out of time on rendering our images.

@@ -83,6 +83,18 @@ void readfile(const char* filename)
       attenuation[0] = 1;
       attenuation[1] = 0;
       attenuation[2] = 0;
+      diffuse[0] = 0;
+      diffuse[1] = 0;
+      diffuse[2] = 0;
+      specular[0] = 0;
+      specular[1] = 0;
+      specular[2] = 0;
+      shininess = 0;
+      emission[0] = 0;
+      emission[1] = 0;
+      emission[2] = 0;
+
+
       outputst = "testing.png";
 
       getline (in, str); 

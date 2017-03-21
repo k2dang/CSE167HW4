@@ -31,6 +31,13 @@ void Scene::Raytrace(Camera cam, int width, int height, float * filmPixel) {
 			filmPixel[(i * width * 3) + ((j * 3) + 0)] = 255*color.z;
    		filmPixel[(i * width * 3) + ((j * 3) + 1)] = 255*color.y;
    		filmPixel[(i * width * 3) + ((j * 3) + 2)] = 255*color.x;
+
+
+   // 		std::cerr << "\nred: " << 255*color.x;
+			// std::cerr << "\ngreen: " << 255*color.y;
+			// std::cerr << "\nblue: " << 255*color.z;
+
+
 		}
 	}
 }
@@ -174,6 +181,8 @@ Scene::Intersection Scene::Intersect(Ray ray) {
 		minT = t;
 		vec3 Pos3 = origin + (dirn * t);
 		vec3 N3 = (Pos3 - center) / length(Pos3 - center);
+		retIntersect.preNorm = N3;
+		retIntersect.prePos = Pos3;
 
     // Convert Intersect components to vec4 to forawrd transform
     vec4 tempPos = vec4(Pos3.x, Pos3.y, Pos3.z, 1.0);
@@ -277,6 +286,9 @@ Scene::Intersection Scene::Intersect(Ray ray) {
     vec4 p4 = vec4(P.x, P.y, P.z, 1);
     vec4 n4 = vec4(normal.x, normal.y, normal.z, 1);
 
+    retIntersect.prePos = P;
+    retIntersect.preNorm = normal;
+
     // Forward transform pos and inverse transpose normal
     vec4 ipos4 = tri->transform * p4;
     vec4 norm4 = inverse(transpose(tri->transform)) * n4;
@@ -326,15 +338,17 @@ vec3 Scene::FindColor(Camera cam, Intersection hit) {
   vec3 amb = hit.amb;
   
   mat4 modelview = hit.objTrans;
-  vec4 myvertex = vec4(hit.position, 1.0f);
+  vec4 myvertex = vec4(hit.prePos, 1.0f);
   vec4 _mypos =  modelview * myvertex;
-  vec3 mypos = vec3(_mypos.x/_mypos.w, _mypos.y/_mypos.w, _mypos.z/_mypos.w);
+  // vec3 mypos = vec3(_mypos.x/_mypos.w, _mypos.y/_mypos.w, _mypos.z/_mypos.w);
+  vec3 mypos = hit.position;
   vec3 eyedirn = normalize(cam.eye - mypos);
 
   // Compute Normal
-  vec4 _normal = transpose(inverse(modelview))*vec4(hit.normal, 0.0f);
+  vec4 _normal = transpose(inverse(modelview))*vec4(hit.preNorm, 0.0f);
   vec3 m_norm = vec3(_normal.x, _normal.y, _normal.z);
-  vec3 normal = normalize(m_norm);
+  // vec3 normal = normalize(m_norm);
+  vec3 normal = hit.normal;
 
   for (std::vector<DLight>::iterator dl = dirLightVect.begin(); 
 			 dl != dirLightVect.end(); ++dl) {
@@ -343,7 +357,7 @@ vec3 Scene::FindColor(Camera cam, Intersection hit) {
     vec3 curLCol = vec3(dl->i, dl->j, dl->k);;
     vec3 direction = normalize(lightDir);
     vec3 half = normalize(direction + eyedirn);
-    vec3 at = vec3(1, 0,0);
+    vec3 at = vec3(1, 0, 0);
     vec3 tcol = ComputeLight(direction, normal,
         half, diff, spec, shininess);
     vec3 tat = curLCol / at;
